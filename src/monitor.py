@@ -114,7 +114,7 @@ class Monitor:
             await self._handle_edit(event)
         
         # Register delete handler
-        @self.client.on(events.MessageDeleted())
+        @self.client.on(events.MessageDeleted(chats=self.settings.HER_USER_ID))
         async def on_message_deleted(event):
             await self._handle_delete(event)
         

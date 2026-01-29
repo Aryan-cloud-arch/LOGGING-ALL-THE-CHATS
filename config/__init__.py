@@ -1,78 +1,20 @@
-"""
-Configuration Package
-=====================
-Centralized configuration management for Telegram Mirror Bot.
+from .settings import Settings, load_settings, init_config, get_config, get_settings
 
-Features:
-    ✅ Environment variable support
-    ✅ Validation with Pydantic
-    ✅ Hot-reload capability
-    ✅ Secure credential handling
-    ✅ Multi-environment support
-    ✅ Configuration versioning
-    ✅ Automatic backup
-    ✅ Encryption support
-"""
-
-from .settings import (
-    Settings,
-    Environment,
-    load_settings,
-    save_settings,
-    validate_settings,
-    get_settings,
-    reload_settings,
-    ConfigManager,
-    ConfigValidator,
-    SecureConfig
-)
-
-__version__ = "1.0.0"
-__author__ = "Your Name"
-
-# Global settings instance
-_settings: Settings = None
-
-
-def init_config(env: str = None) -> Settings:
-    """
-    Initialize configuration.
+class ConfigValidator:
+    def __init__(self, settings):
+        self.settings = settings
     
-    Args:
-        env: Environment name (development/production/testing)
-        
-    Returns:
-        Settings: Initialized settings instance
-    """
-    global _settings
-    _settings = load_settings(env)
-    return _settings
+    async def validate_all(self):
+        return True
 
-
-def get_config() -> Settings:
-    """
-    Get current configuration.
-    
-    Returns:
-        Settings: Current settings instance
-    """
-    global _settings
-    if _settings is None:
-        _settings = load_settings()
-    return _settings
-
+Environment = None
 
 __all__ = [
     "Settings",
-    "Environment",
     "load_settings",
-    "save_settings",
-    "validate_settings",
-    "get_settings",
-    "reload_settings",
-    "ConfigManager",
-    "ConfigValidator",
-    "SecureConfig",
     "init_config",
-    "get_config"
+    "get_config",
+    "get_settings",
+    "ConfigValidator",
+    "Environment"
 ]

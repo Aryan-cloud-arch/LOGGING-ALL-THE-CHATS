@@ -15,7 +15,12 @@ from datetime import datetime
 
 import aiofiles
 from PIL import Image, ImageOps
-import ffmpeg
+
+# Make ffmpeg optional for Termux
+try:
+    import ffmpeg
+except ImportError:
+    ffmpeg = None
 
 from .helpers import format_file_size, sanitize_filename, ensure_directory
 from .logger import get_logger
@@ -71,7 +76,7 @@ async def cleanup_temp(
             path = Path(path)
             if path.exists():
                 path.unlink()
-                logger.debug(f"🗑️ Deleted temp file: {path}")
+                logger.debug(f"Deleted temp file: {path}")
                 return 1
         except Exception as e:
             logger.error(f"Failed to delete {path}: {e}")
@@ -95,7 +100,7 @@ async def cleanup_temp(
                     logger.error(f"Failed to delete {file}: {e}")
     
     if deleted > 0:
-        logger.info(f"🧹 Cleaned up {deleted} old temp files")
+        logger.info(f"Cleaned up {deleted} old temp files")
     
     return deleted
 
@@ -131,9 +136,9 @@ async def get_media_info(file_path: Union[str, Path]) -> Dict[str, Any]:
     
     if mime.startswith("image/"):
         info.update(await _get_image_info(file_path))
-    elif mime.startswith("video/"):
+    elif mime.startswith("video/") and ffmpeg:
         info.update(await _get_video_info(file_path))
-    elif mime.startswith("audio/"):
+    elif mime.startswith("audio/") and ffmpeg:
         info.update(await _get_audio_info(file_path))
     
     return info
@@ -183,6 +188,9 @@ async def _get_image_info(file_path: Path) -> Dict[str, Any]:
 
 async def _get_video_info(file_path: Path) -> Dict[str, Any]:
     """Get video-specific information."""
+    if not ffmpeg:
+        return {"type": "video", "note": "ffmpeg not available"}
+    
     try:
         probe = ffmpeg.probe(str(file_path))
         
@@ -215,6 +223,9 @@ async def _get_video_info(file_path: Path) -> Dict[str, Any]:
 
 async def _get_audio_info(file_path: Path) -> Dict[str, Any]:
     """Get audio-specific information."""
+    if not ffmpeg:
+        return {"type": "audio", "note": "ffmpeg not available"}
+    
     try:
         probe = ffmpeg.probe(str(file_path))
         
@@ -296,7 +307,7 @@ async def optimize_photo(
         if new_size < original_size:
             reduction = (1 - new_size / original_size) * 100
             logger.info(
-                f"📸 Image optimized: {format_file_size(original_size)} → "
+                f"Image optimized: {format_file_size(original_size)} → "
                 f"{format_file_size(new_size)} ({reduction:.1f}% reduction)"
             )
         
@@ -329,6 +340,10 @@ async def compress_video(
     Returns:
         Optional[str]: Output path if successful
     """
+    if not ffmpeg:
+        logger.warning("Video compression skipped: ffmpeg not available")
+        return str(input_path)
+    
     try:
         input_path = Path(input_path)
         output_path = Path(output_path) if output_path else \
@@ -386,7 +401,7 @@ async def compress_video(
         if new_size < original_size:
             reduction = (1 - new_size / original_size) * 100
             logger.info(
-                f"🎬 Video compressed: {format_file_size(original_size)} → "
+                f"Video compressed: {format_file_size(original_size)} → "
                 f"{format_file_size(new_size)} ({reduction:.1f}% reduction)"
             )
         
@@ -472,51 +487,13 @@ class MediaProcessor:
                 result["optimized"] = True
                 result["output"] = output
                 
-        elif mime.startswith("video/"):
+        elif mime.startswith("video/") and ffmpeg:
             output = await compress_video(file_path)
             if output:
                 result["optimized"] = True
                 result["output"] = output
         
         return result
-    
-    async def batch_process(
-        self,
-        files: list[Union[str, Path]],
-        optimize: bool = True,
-        parallel: int = 3
-    ) -> list[Dict[str, Any]]:
-        """
-        Process multiple media files.
-        
-        Args:
-            files: List of file paths
-            optimize: Whether to optimize
-            parallel: Number of parallel processes
-            
-        Returns:
-            List of processing results
-        """
-        semaphore = asyncio.Semaphore(parallel)
-        
-        async def process_one(file_path):
-            async with semaphore:
-                return await self.process_media(file_path, optimize)
-        
-        tasks = [process_one(f) for f in files]
-        results = await asyncio.gather(*tasks, return_exceptions=True)
-        
-        # Filter out exceptions
-        processed = []
-        for i, result in enumerate(results):
-            if isinstance(result, Exception):
-                logger.error(f"Failed to process {files[i]}: {result}")
-                self._stats["failed"] += 1
-            else:
-                processed.append(result)
-                self._stats["processed"] += 1
-        
-        return processed
     
     def get_stats(self) -> Dict[str, Any]:
         """Get processing statistics."""
@@ -573,7 +550,7 @@ class ThumbnailGenerator:
         
         if mime_type.startswith("image/"):
             return await self._generate_image_thumb(input_path, output_path)
-        elif mime_type.startswith("video/"):
+        elif mime_type.startswith("video/") and ffmpeg:
             return await self._generate_video_thumb(input_path, output_path)
         
         logger.warning(f"Unsupported media type: {mime_type}")
@@ -605,7 +582,7 @@ class ThumbnailGenerator:
                 # Save
                 img.save(output_path, format='JPEG', quality=80)
             
-            logger.debug(f"✅ Thumbnail generated: {output_path}")
+            logger.debug(f"Thumbnail generated: {output_path}")
             return str(output_path)
             
         except Exception as e:
@@ -618,6 +595,10 @@ class ThumbnailGenerator:
         output_path: Optional[Path]
     ) -> Optional[str]:
         """Generate thumbnail for video."""
+        if not ffmpeg:
+            logger.warning("Video thumbnails require ffmpeg")
+            return None
+            
         try:
             if not output_path:
                 output_path = input_path.with_suffix('.thumb.jpg')
@@ -647,7 +628,7 @@ class ThumbnailGenerator:
                 stderr=asyncio.subprocess.DEVNULL
             )
             
-            logger.debug(f"✅ Video thumbnail generated: {output_path}")
+            logger.debug(f"Video thumbnail generated: {output_path}")
             return str(output_path)
             
         except Exception as e:

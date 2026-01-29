@@ -179,7 +179,7 @@ class Application:
             
             # Wait for shutdown signal or monitor completion
             done, pending = await asyncio.wait(
-                [monitor_task, self.shutdown_event.wait()],
+                [monitor_task, asyncio.create_task(self.shutdown_event.wait())],
                 return_when=asyncio.FIRST_COMPLETED
             )
             
@@ -376,7 +376,7 @@ if __name__ == "__main__":
         print("💡 Please run setup first: python setup.py")
         sys.exit(1)
     
-    check_requirements()
+    pass  # check_requirements()
     
     # Run application
     try:

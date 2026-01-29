@@ -36,7 +36,7 @@ httpx>=0.24.0
 # === MEDIA PROCESSING ===
 Pillow>=9.5.0
 # Image processing
-ffmpeg-python>=0.2.0
+#ffmpeg-python>=0.2.0
 # Video processing wrapper
 
 # === UTILITIES ===
