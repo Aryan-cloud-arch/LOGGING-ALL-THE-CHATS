@@ -1,0 +1,118 @@
+# ========================================
+# Telegram Mirror Bot - Dependencies
+# ========================================
+# Production-ready package list
+# Python 3.8+ required
+# ========================================
+
+# === CORE TELEGRAM ===
+telethon>=1.28.0,<2.0.0
+# Telegram MTProto client library
+
+# === TELEGRAM BOT API ===
+python-telegram-bot>=20.0,<21.0
+# Official Bot API wrapper (backup)
+
+# === DATABASE ===
+motor>=3.1.0,<4.0.0
+# Async MongoDB driver
+pymongo>=4.3.0,<5.0.0
+# MongoDB driver (sync fallback)
+
+# === CONFIGURATION ===
+pydantic>=1.10.0,<2.0.0
+# Data validation and settings
+python-dotenv>=1.0.0
+# Environment variable management
+
+# === ASYNC & NETWORKING ===
+aiofiles>=23.1.0
+# Async file operations
+aiohttp>=3.8.0
+# Async HTTP client
+httpx>=0.24.0
+# Modern HTTP client
+
+# === MEDIA PROCESSING ===
+Pillow>=9.5.0
+# Image processing
+ffmpeg-python>=0.2.0
+# Video processing wrapper
+
+# === UTILITIES ===
+colorama>=0.4.6
+# Cross-platform colored terminal
+phonenumbers>=8.13.0
+# Phone number parsing and validation
+python-dateutil>=2.8.0
+# Date/time utilities
+pytz>=2023.3
+# Timezone support
+
+# === MONITORING ===
+psutil>=5.9.0
+# System and process monitoring
+memory-profiler>=0.61.0
+# Memory profiling
+
+# === SECURITY ===
+cryptography>=41.0.0
+# Encryption utilities
+
+# === DATA FORMATS ===
+pyyaml>=6.0
+# YAML configuration support
+ujson>=5.7.0
+# Ultra-fast JSON
+msgpack>=1.0.5
+# Binary serialization
+
+# === LOGGING ===
+loguru>=0.7.0
+# Advanced logging (optional)
+
+# === TESTING (Development) ===
+pytest>=7.3.0
+# Testing framework
+pytest-asyncio>=0.21.0
+# Async testing support
+pytest-cov>=4.1.0
+# Coverage reporting
+black>=23.3.0
+# Code formatter
+flake8>=6.0.0
+# Linting
+mypy>=1.3.0
+# Type checking
+
+# === DOCUMENTATION (Development) ===
+mkdocs>=1.4.0
+# Documentation generator
+mkdocs-material>=9.1.0
+# Material theme for docs
+
+# ========================================
+# INSTALLATION NOTES
+# ========================================
+#
+# Standard Installation:
+#   pip install -r requirements.txt
+#
+# Development Installation:
+#   pip install -r requirements.txt
+#
+# Termux Installation:
+#   pkg install python python-pip
+#   pip install --upgrade pip
+#   pip install -r requirements.txt
+#
+# System Dependencies (Ubuntu/Debian):
+#   sudo apt update
+#   sudo apt install python3-dev python3-pip
+#   sudo apt install ffmpeg
+#   sudo apt install mongodb
+#
+# System Dependencies (Termux):
+#   pkg install python ffmpeg
+#
+# ========================================
