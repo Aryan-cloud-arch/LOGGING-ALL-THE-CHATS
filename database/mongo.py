@@ -230,4 +230,27 @@ class MongoManager:
         return self._connected
     
     async def __aenter__(self):
-        """Async 
+        """Async context manager entry."""
+        await self.connect()
+        return self
+    
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        """Async context manager exit."""
+        await self.disconnect()
+
+
+# Convenience functions
+async def get_mongo_manager(uri: str = None) -> MongoManager:
+    """
+    Get or create MongoDB manager instance.
+    
+    Args:
+        uri: MongoDB connection URI
+        
+    Returns:
+        MongoManager: Singleton instance
+    """
+    manager = MongoManager(uri)
+    if not manager.is_connected:
+        await manager.connect()
+    return manager
