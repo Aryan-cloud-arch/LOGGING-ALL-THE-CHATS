@@ -1,0 +1,78 @@
+# ========================================
+# Docker Ignore Rules
+# ========================================
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+CHANGELOG.md
+CONTRIBUTING.md
+LICENSE
+docs/
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Testing
+tests/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Temporary files
+temp/
+tmp/
+*.tmp
+*.log
+
+# Media
+media/
+downloads/
+
+# Sensitive files
+.env
+.env.*
+!.env.example
+*.session
+sessions/
+config.json
+backups/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node (if any)
+node_modules/
+npm-debug.log
+
+# Misc
+*.bak
+*.swp
+*~
